@@ -32,14 +32,14 @@ class nn_sequential_model:
         return the final predictions
         """
         act = []
-        z = self.layers[0].activation(X)
+        z = (self.layers[0].activation(X))
         act.append(z)
         for i in range(1, self.no_of_layers):
             a = np.dot(self.weights[i - 1].T, z)
-            a += np.array(self.biases[i - 1])
+            a += self.biases[i - 1]
             z = self.layers[i].activation(a)
             act.append(z)
-        return (np.array(z), np.array(act))
+        return np.array(z), np.array(act)
 
     def back_prop(self, lr, pred, Y, act, loss):
         """
@@ -54,9 +54,7 @@ class nn_sequential_model:
         for i in range(self.no_of_layers - 1, -1, -1):
             delta = err * self.layers[i].activation(act[i], derv=True)
             if i < (self.no_of_layers - 1):
-                # print("delta: ", delta)
-                # print("act: ", act[i + 1])
-                grad = np.outer(delta.T, act[i + 1])
+                grad = np.outer(delta, act[i + 1])
                 self.weights[i] -= lr * grad
             if i > 0:
                 self.biases[i - 1] -= lr * delta
@@ -74,11 +72,14 @@ class nn_sequential_model:
         if lr == None:
             lr = 0.01
         ep, err = [], []
+        self.biases = np.array(self.biases)
+        # self.weights = np.matrix(self.weights)
         self.weights = np.array(self.weights)
         for _ in range(epochs):
             print("epoch: " + str(_), end='\t')
             idx = np.random.randint(0, len(X_train))
             pred, act = self.feed_forward(X_train[idx])
+
             error = self.back_prop(lr=lr,
                                    pred=pred,
                                    Y=Y_train[idx],
