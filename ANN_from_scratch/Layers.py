@@ -3,13 +3,13 @@ import NonLinearizers
 
 class dense_layer:
 
-    def __init__(self, non, activation):
+    def __init__(self, units, activation):
         """
         arguments:
         non -- number of nodes in that layer
         activation -- string describing the activation associated with this layer
         """
-        self.non = non
+        self.units = units
         if activation == "sigmoid":
             self.activation = NonLinearizers.sigmoid
         elif activation == "tanh":

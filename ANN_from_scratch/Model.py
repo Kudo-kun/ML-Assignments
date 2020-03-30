@@ -1,5 +1,6 @@
-import numpy as np
+from os import system
 import Losses
+import numpy as np
 import NonLinearizers
 import matplotlib.pyplot as plt
 
@@ -10,9 +11,10 @@ class nn_sequential_model:
         self.layers = []
         self.weights = []
         self.biases = []
+        self.loss = ""
         self.no_of_layers = 0
 
-    def add_layer(self, layer):
+    def add_layer(self, layer, seed=0):
         """
         add a new layer to the model
         i.e. append a new set of weights
@@ -20,9 +22,10 @@ class nn_sequential_model:
         """
         self.layers.append(layer)
         self.no_of_layers += 1
+        np.random.seed(seed)
         if self.no_of_layers > 1:
-            n = self.layers[-1].non
-            m = self.layers[-2].non
+            n = self.layers[-1].units
+            m = self.layers[-2].units
             self.weights.append(np.random.randn(m, n))
             self.biases.append(np.random.randn(n))
 
@@ -48,20 +51,21 @@ class nn_sequential_model:
         """
         deltas = []
         if loss == "MSE":
-            err = Losses.MSE(Y, pred, derivative=True)
+            error, err_derv = Losses.MSE(Y, pred)
+        elif loss == "binary_crossentropy":
+            error, err_derv = Losses.binary_crossentropy(Y, pred)
 
-        curr_error = (np.sum(err ** 2) * 0.5)
         for i in range(self.no_of_layers - 1, -1, -1):
-            delta = err * self.layers[i].activation(act[i], derv=True)
+            delta = err_derv * self.layers[i].activation(act[i], derv=True)
             if i < (self.no_of_layers - 1):
                 grad = np.outer(delta, act[i + 1])
                 self.weights[i] -= lr * grad
             if i > 0:
                 self.biases[i - 1] -= lr * delta
-                err = np.dot(self.weights[i - 1], delta)
-        return curr_error
+                err_derv = np.dot(self.weights[i - 1], delta)
+        return error
 
-    def train(self, X_train, Y_train, epochs, lr=None, plot_freq=None):
+    def train(self, X_train, Y_train, epochs, loss, lr=0.01, plot_freq=None):
         """
         performs an SGD on the data.
         A single data point is chosen
@@ -69,30 +73,29 @@ class nn_sequential_model:
         forward pass and a backprop are
         completed.
         """
-        if lr == None:
-            lr = 0.01
         ep, err = [], []
+        self.loss = loss
         self.biases = np.array(self.biases)
-        # self.weights = np.matrix(self.weights)
         self.weights = np.array(self.weights)
-        for _ in range(epochs):
+        for _ in range(epochs + 1):
             print("epoch: " + str(_), end='\t')
             idx = np.random.randint(0, len(X_train))
             pred, act = self.feed_forward(X_train[idx])
-
             error = self.back_prop(lr=lr,
                                    pred=pred,
                                    Y=Y_train[idx],
                                    act=act,
-                                   loss="MSE")
+                                   loss=loss)
+
             print(error)
             if plot_freq != None and (_ % plot_freq) == 0:
                 ep.append(_)
                 err.append(error)
-        print("training complete!")
+
+        print("training complete!\n")
         if plot_freq != None:
-            plt.xlabel("epochs")
-            plt.ylabel("error")
+            plt.xlabel("epochs -->")
+            plt.ylabel("error -->")
             plt.plot(ep, err)
             plt.show()
         return
@@ -108,5 +111,21 @@ class nn_sequential_model:
         return np.array(result)
 
     def evaluate(self, pred, Y_test):
-        print("y_pred: ", pred)
-        print("y_test: ", np.array(Y_test))
+        if self.loss == "MSE":
+            error, _ = Losses.MSE(Y_test, pred)
+            print(error)
+        elif self.loss == "binary_crossentropy":
+            tp, tn, fp, fn = 0, 0, 0, 0
+            for x, y in (pred, Y):
+                if x == [1] and y == [1]:
+                    tp += 1
+                elif x == [0] and y == [0]:
+                    tn += 1
+                elif x == [1] and y == [0]:
+                    fp += 1
+                elif x == [0] and y == [1]:
+                    fn += 1
+
+            error = ((fp + fn) / (fp + fn + tp + tn))
+            accuracy = (1 - error) * 100
+            print(accuracy)

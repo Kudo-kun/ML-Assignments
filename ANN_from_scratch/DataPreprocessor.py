@@ -6,9 +6,8 @@ class UnlimitedDataWorks:
 
     def __init__(self):
         print("Starting Reality Marble...")
-        self.count = 0
 
-    def train_test_split(self, df, normalize=False):
+    def train_test_split(self, df, xfeatures, normalize=False):
         data = pd.DataFrame([])
         if normalize:
             for col in df.columns:
@@ -17,8 +16,11 @@ class UnlimitedDataWorks:
                 df[col] = (df[col] - mn) / (mx - mn)
 
         # generate a 70-30 split on the data:
-        X = df[["lat", "lon"]][:304113]
-        Y = df["alt"][:304113]
-        x = df[["lat", "lon"]][304113:]
-        y = df["alt"][304113:]
+        sz = int(len(df) * 0.7)
+        xattr = df.columns[:xfeatures]
+        yattr = df.columns[xfeatures:]
+        X = df[xattr][:sz]
+        Y = df[yattr][:sz]
+        x = df[xattr][sz:]
+        y = df[yattr][sz:]
         return (np.array(X), np.array(Y), np.array(x), np.array(y))
