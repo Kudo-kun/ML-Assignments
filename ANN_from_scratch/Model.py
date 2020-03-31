@@ -1,6 +1,6 @@
-from os import system
 import Losses
 import numpy as np
+from math import sqrt
 import NonLinearizers
 import matplotlib.pyplot as plt
 
@@ -14,7 +14,7 @@ class nn_sequential_model:
         self.loss = ""
         self.no_of_layers = 0
 
-    def add_layer(self, layer, seed=0):
+    def add_layer(self, layer, initialization="normal", seed=0):
         """
         add a new layer to the model
         i.e. append a new set of weights
@@ -26,8 +26,12 @@ class nn_sequential_model:
         if self.no_of_layers > 1:
             n = self.layers[-1].units
             m = self.layers[-2].units
-            self.weights.append(np.random.randn(m, n))
-            self.biases.append(np.random.randn(n))
+            if initialization == "normal":
+                self.weights.append(np.random.randn(m, n))
+                self.biases.append(np.random.randn(n))
+            elif initialization == "uniform":
+                self.weights.append(np.random.random((m, n)))
+                self.biases.append(np.random.random(n))
 
     def feed_forward(self, X):
         """
@@ -78,7 +82,7 @@ class nn_sequential_model:
         self.biases = np.array(self.biases)
         self.weights = np.array(self.weights)
         for _ in range(epochs + 1):
-            print("epoch: " + str(_), end='\t')
+            print("epoch: {}".format(_), end='\t')
             idx = np.random.randint(0, len(X_train))
             pred, act = self.feed_forward(X_train[idx])
             error = self.back_prop(lr=lr,
@@ -128,11 +132,13 @@ class nn_sequential_model:
         """
         if self.loss == "mse":
             error, _ = Losses.MSE(Y_test, pred)
-            print("final error: {}".format(error))
+            mse = (error / pred.shape[0])
+            rmse = sqrt(mse)
+            print("final mse: {}\nfinal rmse: {}".format(mse, rmse))
         elif self.loss == "binary_crossentropy":
-            tp, tn, fp, fn = 0, 0, 0, 0
             pred[pred >= 0.5] = 1
             pred[pred < 0.5] = 0
+            tp, tn, fp, fn = 0, 0, 0, 0
             zipped = np.array(list(zip(pred, Y_test)))
             for (x, y) in zipped:
                 if x == 1 and y == 1:
@@ -144,7 +150,10 @@ class nn_sequential_model:
                 elif x == 0 and y == 1:
                     fn += 1
 
+            print("tp = {}, tn = {}, fp = {}, fn = {}".format(tp, tn, fp, fn))
             accuracy = ((tp + tn) / (fp + fn + tp + tn)) * 100
             recall = (tp / (tp + fn)) * 100
             precision = (tp / (tp + fp)) * 100
-            print("final accuracy: {}\nfinal recall: {}\nfinal precision: {}".format(accuracy, recall, precision))
+            fscore = 2 * ((precision * recall) / (precision + recall))
+            print("final accuracy: {}\nfinal recall: {}\nfinal precision: {}\nfinal fscore: {}".format(
+                accuracy, recall, precision, fscore))
