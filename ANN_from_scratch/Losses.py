@@ -12,13 +12,13 @@ def binary_crossentropy(Y, pred):
     error, delta = 0, []
     for i in range(sz):
         if Y[i] == 1:
-            error += np.log(pred[i])
-            delta.append(1 / pred[i])
+            error += (-np.log(pred[i]))
+            delta.append(-1 / pred[i])
         elif Y[i] == 0:
-            error += (1 - np.log(pred[i]))
+            error += (-np.log(1 - pred[i]))
             delta.append(1 / (1 - pred[i]))
     delta = np.array(delta)
-    return (-error, -delta)
+    return (error, delta)
 
 
 def categorical_crossentropy(Y, pred):
@@ -26,7 +26,7 @@ def categorical_crossentropy(Y, pred):
     error, delta = 0, []
     for i in range(sz):
         if Y[i] == 1:
-            error += np.log(pred[i])
-            delta.append(1 / pred[i])
+            error += (-np.log(pred[i]))
+            delta.append(-1 / pred[i])
     delta = np.array(delta)
-    return (-error, -delta)
+    return (error, delta)

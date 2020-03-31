@@ -50,7 +50,7 @@ class nn_sequential_model:
         and tweaks the weights
         """
         deltas = []
-        if loss == "MSE":
+        if loss == "mse":
             error, err_derv = Losses.MSE(Y, pred)
         elif loss == "binary_crossentropy":
             error, err_derv = Losses.binary_crossentropy(Y, pred)
@@ -95,15 +95,26 @@ class nn_sequential_model:
         print("training complete!\n")
         if plot_freq != None:
             plt.xlabel("epochs -->")
-            plt.ylabel("error -->")
+            plt.ylabel("cost -->")
             plt.plot(ep, err)
             plt.show()
         return
 
     def get_parameters():
+        """
+        return the parameters
+        of the neural network
+        """
         return (self.weights, self.biases)
 
     def predict(self, X_test):
+        """
+        returns the predictions
+        for the given testing points
+        based on the trained weights
+        and biases. It's expected the
+        model is trained beforehand
+        """
         result = []
         for x in X_test:
             err, _ = self.feed_forward(x)
@@ -111,21 +122,29 @@ class nn_sequential_model:
         return np.array(result)
 
     def evaluate(self, pred, Y_test):
-        if self.loss == "MSE":
+        """
+        prints the necessary metrics
+        for the corresponding prediction
+        """
+        if self.loss == "mse":
             error, _ = Losses.MSE(Y_test, pred)
-            print(error)
+            print("final error: {}".format(error))
         elif self.loss == "binary_crossentropy":
             tp, tn, fp, fn = 0, 0, 0, 0
-            for x, y in (pred, Y):
-                if x == [1] and y == [1]:
+            pred[pred >= 0.5] = 1
+            pred[pred < 0.5] = 0
+            zipped = np.array(list(zip(pred, Y_test)))
+            for (x, y) in zipped:
+                if x == 1 and y == 1:
                     tp += 1
-                elif x == [0] and y == [0]:
+                elif x == 0 and y == 0:
                     tn += 1
-                elif x == [1] and y == [0]:
+                elif x == 1 and y == 0:
                     fp += 1
-                elif x == [0] and y == [1]:
+                elif x == 0 and y == 1:
                     fn += 1
 
-            error = ((fp + fn) / (fp + fn + tp + tn))
-            accuracy = (1 - error) * 100
-            print(accuracy)
+            accuracy = ((tp + tn) / (fp + fn + tp + tn)) * 100
+            recall = (tp / (tp + fn)) * 100
+            precision = (tp / (tp + fp)) * 100
+            print("final accuracy: {}\nfinal recall: {}\nfinal precision: {}".format(accuracy, recall, precision))
