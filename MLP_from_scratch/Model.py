@@ -55,7 +55,7 @@ class nn_sequential_model:
 		and tweaks the weights and 
 		biases in the network
 		"""
-		deltas = []
+		deltas, grad_w, grad_b = [], [], []
 		if self.loss == "mse":
 			error = Losses.mean_squared_error(Y, pred)
 		elif self.loss == "binary_crossentropy":
@@ -67,16 +67,24 @@ class nn_sequential_model:
 				delta = ed * self.layers[i].activation(pre_act[i],
 													   derv=True)
 				grad = np.outer(delta, act[i + 1])
-				self.weights[i] -= (self.lr * grad)
+				grad_w.append(grad)
 			if i > 0:
-				self.biases[i - 1] -= (self.lr * delta)
+				grad_b.append(delta)
 				ed = np.dot(self.weights[i - 1], delta)
+		
+		grad_w = np.array(grad_w[::-1])
+		grad_b = np.array(grad_b[::-1])
+		dw, db = self.optimizer.update(grad_w, grad_b)
+		self.weights -= dw
+		self.biases -= db
 		return error
 
-	def compile(self, loss, epochs, learning_rate=0.01):
-		self.lr = learning_rate
+	def compile(self, loss, epochs, optimizer):
+		# self.lr = learning_rate
 		self.loss = loss
 		self.epochs = epochs+1
+		self.optimizer = optimizer
+		self.optimizer.set_init(self.weights, self.biases)
 
 	def fit(self, X_train, Y_train, plot_freq=None):
 		"""

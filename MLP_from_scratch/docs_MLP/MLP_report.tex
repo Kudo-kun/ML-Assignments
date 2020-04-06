@@ -4,9 +4,11 @@
 \usepackage{xcolor}
 \usepackage{ragged2e}
 \usepackage{lipsum,multicol}
+\usepackage{comment}
 \usepackage{graphicx}
 \usepackage{subfig}
 \usepackage{amsmath, amsfonts}
+\usepackage[english]{babel}
 \usepackage{times}
 \date{}
 \author{}
@@ -53,8 +55,7 @@ The first model we built was a 2-layer neural network (i.e. with one hidden laye
 \end{itemize}
 
 \subsection*{\textcolor{red}{5.2 Three-Layer NN}}
-The second model we built and experimented with was a three layer neural network. The accuracy of the three layer neural network was found to be better than that of the two layer network. Both the hidden layers had 5 neurons with ReLU activation for optimal results. Training the network, in this case, required more iterations as there were more number of parameter to be tuned than the two layer network. The optimal number of neurons for both hidden layers were chosen accordingly as suggested in research article ``\emph{Review on Methods to Fix Number of Hidden
-Neurons in Neural Networks}" by Gnana Sheela et al. Once again, best results were obtained using uniform distribution of weights with \textit{learning\_rate=0.01} and 40000 iterations. The following combination yielded the highest accuracy of 91.43\% with a minimum accuracy of 77\% and an average accuracy of 82\%.
+The second model we built and experimented with was a three layer neural network. The accuracy of the three layer neural network was found to be better than that of the two layer network. Both the hidden layers had 5 neurons with ReLU activation for optimal results. Training the network, in this case, required more iterations as there were more number of parameter to be tuned than the two layer network. The optimal number of neurons for both hidden layers were chosen accordingly as suggested in research article \textit{Review on Methods to Fix Number of Hidden Neurons in Neural Networks} by Gnana Sheela et al. Once again, best results were obtained using uniform distribution of weights with \textit{learning\_rate=0.01} and 40000 iterations. The following combination yielded the highest accuracy of 91.43\% with a minimum accuracy of 77\% and an average accuracy of 82\%.
 \begin{figure}[h]
 \centering
 \includegraphics[scale=1.0, width=5cm]{Fig21.png}
@@ -86,9 +87,13 @@ As seen in the figure below, a considerably high accuracy was observed even thou
 \end{itemize}
 [results on next page]
 
+\section*{\textcolor{blue}{7. Additional Work:}}
+\subsection*{\textcolor{red}{7.1 Momentum and Decay}}
+Additionally, we implemented Momentum and Decay to our SGD to accelerate the learning process. Momentum provides an \textit{exponentially weighted average} solution to the gradient according to the following formula: $V_t = \beta V_{t-1} + (1 - \beta)G$ where $G$ is the current gradient and $V_0 = 0$. Later the weights are updates according to: $W = W - \eta V_t$. The value $\beta$ is the momentum parameter (0 $\leq$ $\beta$ $\leq$ 1.0) and helps to retain the \textit{momentum} in the direction of the previous gradient while slowing \textit{forgetting} the older and much previous momentum directions. Decay of the learning rate is as the word suggests. The learning rate is reduced by a certain amount every few steps so that smaller and smaller steps will be taken as we approach the minimum and the chance of overshooting it will decrease.
+
 \newpage
 \onecolumn
-\section*{\textcolor{blue}{7. Results:}}
+\section*{\textcolor{blue}{8. Results:}}
 \begin{figure}[h!]
 \centering
 \includegraphics[scale=1.0, width=5cm]{Fig1.png}
@@ -110,12 +115,18 @@ As seen in the figure below, a considerably high accuracy was observed even thou
 \caption*{2-Layer NN using normal distirbution}
 \end{figure}
 
-
 \begin{figure}[h!]
 \centering
 \includegraphics[scale=1.0, width=5cm]{Fig7.png}
 \includegraphics[scale=1.0, width=5cm]{Fig8.png}
 \caption*{3-Layer NN using normal distirbution}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=1.0, width=5cm]{Fig9.png}
+\includegraphics[scale=1.0, width=5cm]{Fig10.png}
+\caption*{3-Layer NN using uniform distirbution with momentum and decay}
 \end{figure}
 %=================================================================================================================%
 \end{document}
