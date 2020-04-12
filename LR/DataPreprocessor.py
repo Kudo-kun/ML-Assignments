@@ -15,7 +15,6 @@ def train_test_split(df, normalize=False, standardize=False):
                 df[col] = (df[col] - u) / sig
 
     # generate a 70:10:20 split on the data:
-    df = df.reindex(np.random.permutation(df.index))
     df.insert(0, "F0", np.ones(len(df)), True)
     xfeatures = len(df.columns) - 1
     sz1 = int(len(df) * 0.7)

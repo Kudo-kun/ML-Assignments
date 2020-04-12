@@ -1,10 +1,11 @@
+
 import numpy as np
 import matplotlib.pyplot as plt
 
 
 class LogisticRegression:
 
-	def __init__(self, nfeatures, seed=0, initialization="normal"):
+	def __init__(self, nfeatures, seed=5, initialization="normal"):
 		np.random.seed(seed)
 		self.features = nfeatures
 		if initialization == "normal":
@@ -26,6 +27,9 @@ class LogisticRegression:
 		a = -np.dot(y.T, np.log(h))
 		b = -np.dot((1 - y).T, np.log(1 - h))
 		return (a + b)[0]
+
+	def get_params(self):
+		return self.weights
 
 	def fit(self, X, Y, xval=None, yval=None, plot_freq=None):
 		if self.penalty == None:
@@ -55,11 +59,11 @@ class LogisticRegression:
 										   yval=yval,
 										   beta=l2)
 				print(Lmet)
-				if Lmet > max_met:
+				if Lmet >= max_met:
 					max_met = Lmet
 					self.weights = W
 					opt_beta = l2
-			print("optimal lambda: {}".format(opt_beta))
+			print("optimal L2 lambda: {}".format(opt_beta))
 		
 		elif self.penalty == "L1":
 			max_met, opt_beta = 0, 0
@@ -70,11 +74,11 @@ class LogisticRegression:
 										   yval=yval,
 										   beta=l1)
 				print(Lmet)
-				if Lmet > max_met:
+				if Lmet >= max_met:
 					max_met = Lmet
 					self.weights = W
 					opt_beta = l1
-			print("optimal lambda: {}".format(opt_beta))
+			print("optimal L1 lambda: {}".format(opt_beta))
 
 	def fit_with_L2(self, X, Y, xval, yval, beta):
 		W = np.random.random(self.features + 1)

@@ -19,7 +19,7 @@
 In this report, we try to analyse the performance (accuracy, fscore, recall and precision) of a neural network that we built using NumPy. The implementation of this network is similar to that of Keras and the whole code has been written in a completely modularized fashion.
 
 \section*{\textcolor{blue}{2. Data Preprocessing:}}
-The dataset $housepricesdata.csv$ contained 1460 data points, each containing 10 input features (representing house features) and one binary target variable (representing if the house price is above or below the median price). In the preprocessing stage, all features were min-max scaled and randomly split into \textit{train\_set} and \textit{test\_set} (80-20 split ratio).
+The dataset $housepricesdata.csv$ contained 1460 data points, each containing 10 input features (representing house features) and one binary target variable (representing if the house price is above or below the median price). In the preprocessing stage, all features were standardized and randomly split into \textit{train\_set} and \textit{test\_set} (80-20 split ratio).
 
 \section*{\textcolor{blue}{3. Activation functions:}}
 \begin{itemize}
@@ -37,7 +37,7 @@ The dataset $housepricesdata.csv$ contained 1460 data points, each containing 10
 \section*{\textcolor{blue}{5. Network Architecture:}}
 \subsection*{\textcolor{red}{5.1 Two-Layer NN}}
 The first model we built was a 2-layer neural network (i.e. with one hidden layer). We experimented with activations like linear, ReLU and tanh for the hidden layer. The input layer had 10 neuron units with a ReLU activation (for best results. A slight drop in accuracy was observed when linear activation was used for the input layer). The final layer had an activation of sigmoid for binary classification. Output value greater than or equal to 0.5 was taken to represent positive classes and less than 0.5 to represent negative classes.
-\texttt{np.random.random()} and \texttt{np.random.randn()} methods were used to randomly initialize weights and biases associated network to initialize the weights according to a Uniform or Guassian distribution respectively. Best results were obtained using uniformly distributed weights/biases with a \emph{seed=5} and 4 hidden neurons with ReLU and \emph{learning\_rate=0.001} with 20000 training epochs. The loss was observed to have more fluctuations using this configuration after 40000 epochs and thus lowering the accuracy (images attached below). The avg. loss using this configuration was observed to be 0.7 (per data point). The highest accuracy achieved by this model using this configuration was 87.67\% and the lowest accuracy was 75\% with an average accuracy of 81\%.
+\texttt{np.random.random()} and \texttt{np.random.randn()} methods were used to randomly initialize weights and biases associated network to initialize the weights according to a Uniform or Guassian distribution respectively. Best results were obtained using uniformly distributed weights/biases with a \emph{seed=5} and 4 hidden neurons with ReLU and \emph{learning\_rate=0.001} with 20000 training epochs. The loss was observed to have more fluctuations using this configuration after 40000 epochs and thus lowering the accuracy (images attached below). The avg. loss using this configuration was observed to be 0.7 (per data point). The highest accuracy achieved by this model using this configuration was 87.67\% and the lowest accuracy was 80\% with an average accuracy of 84\%.
 \begin{figure}[h]
 \centering
 \includegraphics[scale=1.0, width=5cm]{Fig11.png}
@@ -55,20 +55,23 @@ The first model we built was a 2-layer neural network (i.e. with one hidden laye
 \end{itemize}
 
 \subsection*{\textcolor{red}{5.2 Three-Layer NN}}
-The second model we built and experimented with was a three layer neural network. The accuracy of the three layer neural network was found to be better than that of the two layer network. Both the hidden layers had 5 neurons with ReLU activation for optimal results. Training the network, in this case, required more iterations as there were more number of parameter to be tuned than the two layer network. The optimal number of neurons for both hidden layers were chosen accordingly as suggested in research article \textit{Review on Methods to Fix Number of Hidden Neurons in Neural Networks} by Gnana Sheela et al. Once again, best results were obtained using uniform distribution of weights with \textit{learning\_rate=0.01} and 40000 iterations. The following combination yielded the highest accuracy of 91.43\% with a minimum accuracy of 77\% and an average accuracy of 82\%.
+The second model we built and experimented with was a three layer neural network. The accuracy of the three layer neural network was found to be better than that of the two layer network. Both the hidden layers had 5 neurons with ReLU activation for optimal results. Training the network, in this case, required more iterations as there were more number of parameter to be tuned than the two layer network. The optimal number of neurons for both hidden layers were chosen accordingly as suggested in research article \textit{Review on Methods to Fix Number of Hidden Neurons in Neural Networks} by Gnana Sheela et al. Once again, best results were obtained using uniform distribution of weights with \textit{learning\_rate=0.01} and 40000 iterations. The following combination yielded the highest accuracy of 91.43\% with a minimum accuracy of 80\% and an average accuracy of 86\%.
 \begin{figure}[h]
 \centering
 \includegraphics[scale=1.0, width=5cm]{Fig21.png}
-\caption{Plot of Loss vs Epochs for 40000 iterations with lr=1e-2}
+\caption{Plot of Loss vs Epochs for 40000 iterations with $lr=10^{-2}$}
 \end{figure}
 As seen in the figure below, a considerably high accuracy was observed even though the loss had significant fluctuations. This is due to the high learning rate provided. Lesser fluctuations were observed when the learning rate was decreased to 0.0005. But to compensate the training, the number of iterations had to increased significantly to around 1000000 to achieve an accuracy of 91.43\%
 \begin{figure}[h]
 \centering
 \includegraphics[scale=1.0, width=5cm]{Fig22.png}
-\caption{Plot of Loss vs Epochs for 40000 iterations with lr=5e-4}
+\caption{Plot of Loss vs Epochs for 40000 iterations with $lr=5.10^{-4}$}
 \includegraphics[scale=1.0, width=5cm]{Fig23.png}
-\caption{Plot of Loss vs Epochs for 1000000 iterations with lr=5e-4}
+\caption{Plot of Loss vs Epochs for 1000000 iterations with $lr=5.10{-4}$}
 \end{figure}
+\newline
+\newline
+\newline
 \newline
 \underline{Top metrics achieved by the model:}
 \begin{itemize}
@@ -88,8 +91,31 @@ As seen in the figure below, a considerably high accuracy was observed even thou
 [results on next page]
 
 \section*{\textcolor{blue}{7. Additional Work:}}
-\subsection*{\textcolor{red}{7.1 Momentum and Decay}}
-Additionally, we implemented Momentum and Decay to our SGD to accelerate the learning process. Momentum provides an \textit{exponentially weighted average} solution to the gradient according to the following formula: $V_t = \beta V_{t-1} + (1 - \beta)G$ where $G$ is the current gradient and $V_0 = 0$. Later the weights are updates according to: $W = W - \eta V_t$. The value $\beta$ is the momentum parameter (0 $\leq$ $\beta$ $\leq$ 1.0) and helps to retain the \textit{momentum} in the direction of the previous gradient while slowing \textit{forgetting} the older and much previous momentum directions. Decay of the learning rate is as the word suggests. The learning rate is reduced by a certain amount every few steps so that smaller and smaller steps will be taken as we approach the minimum and the chance of overshooting it will decrease.
+\begin{itemize}
+\item{\textcolor{red}{SGD Momentum and Decay}
+\newline				
+$M_t = \beta M_{t-1} + (1 - \beta)\nabla E$
+\newline
+$W = W - \eta M_t$
+}
+\item{\textcolor{red}{RMSprop}
+\newline
+$V_t = \beta V_{t-1} + (1 - \beta)(\nabla E)^2$
+\newline
+$W = W - \eta \frac{\nabla E}{\sqrt{V_t} + \epsilon}$
+}
+\item{\textcolor{red}{Adam}
+\newline
+$M_t = \beta M_{t-1} + (1 - \beta_1)\nabla E$
+\newline
+$V_t = \beta V_{t-1} + (1 - \beta_2)(\nabla E)^2$
+\newline
+$\hat{M_t} = \frac{M_t}{1 - \beta_1^t}$; $\hat{V_t} = \frac{V_t}{1 - \beta_2^t}$
+\newline
+$W = W - \eta \frac{\hat{M_t}}{\sqrt{\hat{V_t}} + \epsilon}$
+}
+\end{itemize}
+
 
 \newpage
 \onecolumn
@@ -127,6 +153,26 @@ Additionally, we implemented Momentum and Decay to our SGD to accelerate the lea
 \includegraphics[scale=1.0, width=5cm]{Fig9.png}
 \includegraphics[scale=1.0, width=5cm]{Fig10.png}
 \caption*{3-Layer NN using uniform distirbution with momentum and decay}
+\end{figure}
+
+
+\newpage
+\onecolumn
+\section*{\textcolor{blue}{9. Additional Results:}}
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=1.0, width=5cm]{Fig31_Adam.png}
+\includegraphics[scale=1.0, width=5cm]{Fig32_RMSprop.png}
+\includegraphics[scale=1.0, width=5cm]{Fig33_SGD_momentum.png}
+\caption*{Loss vs Epochs for Adam, RMSprop and Momentum respectively}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=1.0, width=5cm]{Fig41_Adam.png}
+\includegraphics[scale=1.0, width=5cm]{Fig42_RMSprop.png}
+\includegraphics[scale=1.0, width=5cm]{Fig43_SGD_momentum.png}
+\caption*{3-Layer NN with Adam, RMSprop and Momentum respectively for 3750 epochs}
 \end{figure}
 %=================================================================================================================%
 \end{document}

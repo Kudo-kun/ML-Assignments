@@ -8,9 +8,9 @@ import matplotlib.pyplot as plt
 class nn_sequential_model:
 
 	def __init__(self):
+		self.W = []
+		self.B = []
 		self.layers = []
-		self.weights = []
-		self.biases = []
 		self.nLayers = 0
 
 	def add_layer(self, layer, initialization="uniform", seed=5):
@@ -19,18 +19,18 @@ class nn_sequential_model:
 		i.e. append a new set of weights
 		and biases
 		"""
-		self.layers.append(layer)
-		self.nLayers += 1
 		np.random.seed(seed)
+		self.nLayers += 1
+		self.layers.append(layer)
 		if self.nLayers > 1:
 			n = self.layers[-1].units
 			m = self.layers[-2].units
 			if initialization == "normal":
-				self.weights.append(np.random.randn(m, n))
-				self.biases.append(np.random.randn(n))
+				self.W.append(np.random.randn(m, n))
+				self.B.append(np.random.randn(n))
 			elif initialization == "uniform":
-				self.weights.append(np.random.random((m, n)))
-				self.biases.append(np.random.random(n))
+				self.W.append(np.random.random((m, n)))
+				self.B.append(np.random.random(n))
 
 	def feed_forward(self, X):
 		"""
@@ -42,8 +42,8 @@ class nn_sequential_model:
 		pre_act.append(X)
 		act.append(z)
 		for i in range(1, self.nLayers):
-			a = np.dot(self.weights[i - 1].T, z)
-			a += self.biases[i - 1]
+			a = np.dot(self.W[i - 1].T, z)
+			a += self.B[i - 1]
 			z = self.layers[i].activation(a)
 			pre_act.append(a)
 			act.append(z)
@@ -70,21 +70,20 @@ class nn_sequential_model:
 				grad_w.append(grad)
 			if i > 0:
 				grad_b.append(delta)
-				ed = np.dot(self.weights[i - 1], delta)
-		
+				ed = np.dot(self.W[i - 1], delta)
+
 		grad_w = np.array(grad_w[::-1])
 		grad_b = np.array(grad_b[::-1])
 		dw, db = self.optimizer.update(grad_w, grad_b)
-		self.weights -= dw
-		self.biases -= db
+		self.W -= dw
+		self.B -= db
 		return error
 
 	def compile(self, loss, epochs, optimizer):
-		# self.lr = learning_rate
 		self.loss = loss
 		self.epochs = epochs+1
 		self.optimizer = optimizer
-		self.optimizer.set_init(self.weights, self.biases)
+		self.optimizer.set_init(self.W, self.B)
 
 	def fit(self, X_train, Y_train, plot_freq=None):
 		"""
@@ -96,16 +95,17 @@ class nn_sequential_model:
 		"""
 		ep, err = [], []
 		for _ in range(self.epochs):
-			idx = np.random.randint(0, len(X_train))
-			pred, pre_act, act = self.feed_forward(X_train[idx])
+			i = np.random.randint(0, len(X_train))
+			pred, pre_act, act = self.feed_forward(X_train[i])
 			error = self.back_prop(pred=pred,
-								   Y=Y_train[idx],
+								   Y=Y_train[i],
 								   pre_act=pre_act,
 								   act=act)
 
 			if plot_freq != None and (_ % plot_freq) == 0:
-				ep.append(_)
+				error = round(error, 2)
 				err.append(error)
+				ep.append(_)
 				print("epoch: {}\tloss: {}".format(_, error))
 
 		if plot_freq != None:
@@ -120,7 +120,7 @@ class nn_sequential_model:
 		return the parameters
 		of the neural network
 		"""
-		return (self.weights, self.biases)
+		return (self.W, self.B)
 
 	def predict(self, X_test):
 		"""
@@ -136,7 +136,7 @@ class nn_sequential_model:
 			result.append(err)
 		return np.array(result)
 
-	def evaluate(self, pred, Y_test):
+	def evaluate(self, pred, Y_test, verbose=False):
 		"""
 		prints the necessary metrics
 		for the corresponding prediction
@@ -157,10 +157,12 @@ class nn_sequential_model:
 			recall = (cm[1][1] / (cm[1][1] + cm[0][1])) * 100
 			precision = (cm[1][1] / np.sum(cm[1])) * 100
 			fscore = 2 * ((precision * recall) / (precision + recall))
-			print("tp = {}, tn = {}, fp = {}, fn = {}".format(
-				cm[1][1], cm[0][0], cm[1][0], cm[0][1]))
-			print("final accuracy: {}".format(accuracy))
-			print("final recall: {}".format(recall))
-			print("final precision: {}".format(precision))
-			print("final fscore: {}".format(fscore))
-			
+			if verbose:
+				print("tp = {}, tn = {}, fp = {}, fn = {}".format(
+					cm[1][1], cm[0][0], cm[1][0], cm[0][1]))
+				print("final accuracy: {}".format(accuracy))
+				print("final recall: {}".format(recall))
+				print("final precision: {}".format(precision))
+				print("final fscore: {}".format(fscore))
+
+			return accuracy
