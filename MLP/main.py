@@ -15,13 +15,13 @@ X_train, Y_train, x_test, y_test = dp.train_test_split(raw_df,
 
 ann = nn_sequential_model()
 ann.add_layer(dense_layer(10, activation="relu"))
-ann.add_layer(dense_layer(7, activation="relu"))
-ann.add_layer(dense_layer(7, activation="relu"))
+ann.add_layer(dense_layer(5, activation="relu"))
+ann.add_layer(dense_layer(5, activation="relu"))
 ann.add_layer(dense_layer(1, activation="sigmoid"))
 
 optim = Adam(lr=5e-3)
 optim = RMSprop(lr=5e-3)
-optim = SGD(lr=5e-3, momentum=0.9, decay=1e-10)
+optim = SGD(lr=5e-3)
 ann.compile(optimizer=optim,
             epochs=3750,
             loss="binary_crossentropy")	

@@ -3,7 +3,7 @@ import numpy as np
 
 class SGD:
 
-	def __init__(self, lr=0.01, momentum=0.9, decay=1e-8):
+	def __init__(self, lr=0.01, momentum=0.9, decay=1e-10):
 		self.lr = lr
 		self.momentum = momentum
 		self.decay = decay
