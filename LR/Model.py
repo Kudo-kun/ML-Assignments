@@ -1,6 +1,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 
 class LogisticRegression:
@@ -34,7 +35,7 @@ class LogisticRegression:
 	def fit(self, X, Y, xval=None, yval=None, plot_freq=None):
 		if self.penalty == None:
 			ep, err = [], []
-			for _ in range(self.epochs):
+			for _ in tqdm(range(self.epochs), ncols=100):
 				h = self.predict(X, self.weights)
 				log_loss = self.loss(Y, h)/h.shape[0]
 				gradients = np.dot(X.T, (h - Y))
@@ -42,7 +43,6 @@ class LogisticRegression:
 				if plot_freq != None and (_ % plot_freq) == 0:
 					ep.append(_)
 					err.append(log_loss)
-					# print("epoch: {}\tloss: {}".format(_, log_loss))
 
 			if plot_freq != None:
 				plt.xlabel("epochs")

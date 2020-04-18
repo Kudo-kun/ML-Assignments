@@ -15,18 +15,18 @@ X_train, Y_train, x_test, y_test = dp.train_test_split(raw_df,
 
 ann = nn_sequential_model()
 ann.add_layer(dense_layer(10, activation="relu"))
-ann.add_layer(dense_layer(5, activation="relu"))
-ann.add_layer(dense_layer(5, activation="relu"))
+ann.add_layer(dense_layer(7, activation="leaky_relu"))
+ann.add_layer(dense_layer(7, activation="leaky_relu"))
 ann.add_layer(dense_layer(1, activation="sigmoid"))
 
-optim = Adam(lr=5e-3)
-optim = RMSprop(lr=5e-3)
-optim = SGD(lr=5e-3)
+optim = Adam(lr=1e-3)
+optim = RMSprop(lr=1e-3)
+optim = SGD(lr=1e-3)
 ann.compile(optimizer=optim,
-            epochs=3750,
+            epochs=20000,
             loss="binary_crossentropy")	
 
-ann.fit(X_train, Y_train, plot_freq=None)
+ann.fit(X_train, Y_train, plot_freq=50)
 
 print("training metrics:")
 ann.evaluate(ann.predict(X_train), Y_train, verbose=True)

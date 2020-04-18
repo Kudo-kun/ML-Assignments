@@ -14,13 +14,11 @@ X_train, Y_train, xval, yval, x_test, y_test = dp.train_test_split(raw_df,
 model = LogisticRegression(nfeatures=4)
 model.compile(epochs=15000,
 			  learning_rate=0.01,
-			  penalty="L2",
+			  penalty=None,
 			  metrics="fscore")
 
 model.fit(X_train,
 		  Y_train,
-		  xval=xval,
-		  yval=yval,
 		  plot_freq=None)
 
 pred = model.predict(x_test, model.weights)

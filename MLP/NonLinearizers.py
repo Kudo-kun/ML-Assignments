@@ -29,7 +29,7 @@ def relu(s, derv=False):
         return np.array([f(i) for i in s])
 
 def leaky_relu(s, derv=False):
-    a = 0.3
+    a = 0.01
     if not derv:
         f = lambda x: (x if x >= 0 else a*x)
         return np.array([f(i) for i in s])

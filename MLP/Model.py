@@ -3,6 +3,7 @@ import numpy as np
 from math import sqrt
 import NonLinearizers
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 
 class nn_sequential_model:
@@ -94,7 +95,7 @@ class nn_sequential_model:
 		completed.
 		"""
 		ep, err = [], []
-		for _ in range(self.epochs):
+		for _ in tqdm(range(0, self.epochs), ncols=100):
 			i = np.random.randint(0, len(X_train))
 			pred, pre_act, act = self.feed_forward(X_train[i])
 			error = self.back_prop(pred=pred,

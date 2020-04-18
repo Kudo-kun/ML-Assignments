@@ -39,31 +39,10 @@ The dataset $housepricesdata.csv$ contained 1460 data points, each containing 10
 \section*{\textcolor{blue}{5. Network Architecture:}}
 \subsection*{\textcolor{red}{5.1 Two-Layer NN}}
 The first model we built was a 2-layer neural network (i.e. with one hidden layer). We experimented with activations like linear, ReLU and tanh for the hidden layer. The input layer had 10 neuron units with a ReLU activation (for best results. A slight drop in accuracy was observed when linear activation was used for the input layer). The final layer had an activation of sigmoid for binary classification. Output value greater than or equal to 0.5 was taken to represent positive classes and less than 0.5 to represent negative classes.
-\texttt{np.random.random()} and \texttt{np.random.randn()} methods were used to randomly initialize weights and biases associated network to initialize the weights according to a Uniform or Guassian distribution respectively. Best results were obtained using uniformly distributed weights/biases with a seed=5 and 4 hidden neurons with ReLU and learning\_rate=0.001 with 20000 training epochs. The loss was observed to have more fluctuations using this configuration after 40000 epochs and thus lowering the accuracy (images attached below). The avg. loss using this configuration was observed to be 0.7 (per data point). The highest accuracy achieved by this model using this configuration was 87.67\% and the lowest accuracy was 80\% with an average accuracy of 84\%.
-
-\begin{figure}[h!]
-\centering
-\includegraphics[scale=1.0, width=5cm]{Fig11.png}
-\caption{Plot of Loss vs Epochs}
-\includegraphics[scale=1.0, width=5cm]{Fig12.png}
-\caption{Fluctuations appear from 40000 iterations}
-\end{figure}
+\texttt{np.random.random()} and \texttt{np.random.randn()} methods were used to randomly initialize weights and biases associated network to initialize the weights according to a Uniform or Guassian distribution respectively. Best results were obtained using uniformly distributed weights/biases with a seed=5 and 4 hidden neurons with ReLU and learning\_rate=0.001 with 20000 training epochs. The loss was observed to have more fluctuations using this configuration after 40000 epochs and thus lowering the accuracy. The avg. loss using this configuration was observed to be 0.7 (per data point). The highest accuracy achieved by this model using this configuration was 87.67\% and the lowest accuracy was 80\% with an average accuracy of 84\%.
 
 \subsection*{\textcolor{red}{5.2 Three-Layer NN}}
 The second model we built and experimented with was a three layer neural network. The accuracy of the three layer neural network was found to be better than that of the two layer network. Both the hidden layers had 5 neurons with ReLU activation for optimal results. Training the network, in this case, required more iterations as there were more number of parameter to be tuned than the two layer network. The optimal number of neurons for both hidden layers were chosen accordingly as suggested in research article \textit{Review on Methods to Fix Number of Hidden Neurons in Neural Networks} by Gnana Sheela et al. Once again, best results were obtained using uniform distribution of weights with learning\_rate=0.01 and 40000 iterations. The following combination yielded the highest accuracy of 91.43\% with a minimum accuracy of 80\% and an average accuracy of 86\%.
-\begin{figure}[h]
-\centering
-\includegraphics[scale=1.0, width=5cm]{Fig21.png}
-\caption{Plot of Loss vs Epochs for 40000 iterations with $lr=10^{-2}$}
-\end{figure}
-As seen in the figure below, a considerably high accuracy was observed even though the loss had significant fluctuations. This is due to the high learning rate provided. Lesser fluctuations were observed when the learning rate was decreased to 0.0005. But to compensate the training, the number of iterations had to increased significantly to around 1000000 to achieve an accuracy of 91.43\%
-\begin{figure}[h]
-\centering
-\includegraphics[scale=1.0, width=5cm]{Fig22.png}
-\caption{Plot of Loss vs Epochs for 40000 iterations with $lr=5.10^{-4}$}
-\includegraphics[scale=1.0, width=5cm]{Fig23.png}
-\caption{Plot of Loss vs Epochs for 1000000 iterations with $lr=5.10{-4}$}
-\end{figure}
 
 \section*{\textcolor{blue}{6. Conclusion:}}
 \begin{itemize}
