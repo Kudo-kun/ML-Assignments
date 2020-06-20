@@ -20,8 +20,8 @@ ann.add_layer(dense_layer(7, activation="leaky_relu"))
 ann.add_layer(dense_layer(1, activation="sigmoid"))
 
 optim = SGD(lr=1e-3)
-optim = Adam(lr=1e-3)
 optim = RMSprop(lr=1e-3)
+optim = Adam(lr=1e-3)
 ann.compile(optimizer=optim,
             epochs=20000,
             loss="binary_crossentropy")	
