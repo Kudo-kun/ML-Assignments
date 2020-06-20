@@ -13,14 +13,15 @@ class Classifier:
 		n = len(self.data) // kfold
 		folds = [self.data[x:x + n] for x in range(0, len(self.data), n)]
 
-		for i in range(kfold):  # k fold cross validation
+		# k fold cross validation
+		for i in range(kfold): 
 			train_data = []
 			test_data = folds[i]
 			for j in range(1, kfold):
 				train_data += folds[(i + j) % kfold]
 			self.train(train_data)
 			self.test(test_data)
-		self.accuracy /= kfold
+		self.accuracy = round(self.accuracy/kfold, 2)
 		print("overall avg accuracy: {}".format(self.accuracy))
 
 	def convert_txt_to_rows(self, file):
@@ -40,14 +41,11 @@ class Classifier:
 	def train(self, train_data):
 		# 1. Splitting
 		# 2. Count each word's frequency and sentiment
-
+		training = dict()
 		train_len = (int)(len(train_data))
 		data = train_data
-		training = dict()
-		total_words_pos_sent = 0
-		total_words_neg_sent = 0
-		tot_pos = 0
-		tot_neg = 0
+		tot_pos = tot_neg = 0
+		total_words_pos_sent = total_words_neg_sent = 0
 		
 		for i in range(train_len):
 			sentiment = int(data[i][len(data[i]) - 1])  # last character
@@ -61,16 +59,17 @@ class Classifier:
 				total_words_pos_sent += len(data[i]) - 1
 				tot_pos += 1
 			  
+			# find the positive and negative sentiments associated with each word
 			for j in range(len(data[i]) - 1):
 				word = data[i][j]
 				if(word == ""):
 					continue
 				if(word not in training):
 					training[word] = dict()
-				if(sentiment not in training[word]):
-					training[word][sentiment] = 0
+					training[word][0] = training[word][1] = 0
 				training[word][sentiment] += 1
 
+		# total number of postive and negative sentiments seen: P(C_k)
 		self.tot_pos = tot_pos
 		self.tot_neg = tot_neg
 		self.training = training
@@ -81,29 +80,24 @@ class Classifier:
 		correctly_classified = 0
 		tot_dist_words = len(self.training.keys())
 		for i in range(len(test_data)):
-			res0, res1 = 1, 1
+			res0 = res1 = 1
 			data = test_data
 			sentiment_ans = data[i][len(data[i]) - 1]
 			for j in range(len(data[i]) - 1):
 				word = data[i][j]
 				if(word not in self.training):
 					self.training[word] = dict()
-				if(0 not in self.training[word]):
-					self.training[word][0] = 0
-				if(1 not in self.training[word]):
-					self.training[word][1] = 0
-				res0 *= (self.training[word][0] + 1) / (self.total_words_neg_sent + tot_dist_words)  # laplacesmoothing
+					self.training[word][0] = self.training[word][1] = 0
+				# laplace_smoothing to avoid 0 probability case
+				# P(C_k | x1, x2, x3 ... xn) = P(C_k) * P(x1 | C_k) * P(x2 | C_k) ... P(xn | C_k)
+				res0 *= (self.training[word][0] + 1) / (self.total_words_neg_sent + tot_dist_words)
 				res1 *= (self.training[word][1] + 1) / (self.total_words_pos_sent + tot_dist_words)
 			res0 *= self.tot_neg
 			res1 *= self.tot_pos
-			if(res0 > res1):
-				if(int(sentiment_ans) == 0):
-					correctly_classified += 1
-			elif(res1 > res0):
-				if(int(sentiment_ans) == 1):
-					correctly_classified += 1
+			if((res0 > res1) and (int(sentiment_ans) == 0)) or ((res0 <= res1) and (int(sentiment_ans) == 1)):
+				correctly_classified += 1
 
-		current_accuracy = correctly_classified / len(test_data)
+		current_accuracy = round(correctly_classified / len(test_data), 2)
 		self.accuracy += current_accuracy
 		print(current_accuracy)
 
