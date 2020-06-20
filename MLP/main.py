@@ -24,11 +24,11 @@ optim = RMSprop(lr=1e-3)
 optim = Adam(lr=1e-3)
 ann.compile(optimizer=optim,
             epochs=20000,
-            loss="binary_crossentropy")	
+            loss="binary_crossentropy")
 
 ann.fit(X_train, Y_train, plot_freq=None)
 
-print("training metrics:")
+print("\ntraining metrics:")
 ann.evaluate(ann.predict(X_train), Y_train, verbose=True)
 print("\ntesting metrics:")
 ann.evaluate(ann.predict(x_test), y_test, verbose=True)
