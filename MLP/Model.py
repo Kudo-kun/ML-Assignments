@@ -107,7 +107,7 @@ class nn_sequential_model:
                 error = round(error, 2)
                 err.append(error)
                 ep.append(_)
-                print("epoch: {}\tloss: {}".format(_, error))
+                # print("epoch: {}\tloss: {}".format(_, error))
 
         if plot_freq != None:
             plt.xlabel("epochs")
