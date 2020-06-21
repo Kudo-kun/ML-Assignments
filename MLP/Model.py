@@ -33,7 +33,7 @@ class nn_sequential_model:
                 self.W.append(np.random.random((m, n)))
                 self.B.append(np.random.random(n))
 
-    def feed_forward(self, X):
+    def _feed_forward(self, X):
         """
         perform a forward pass and
         return the final predictions
@@ -50,7 +50,7 @@ class nn_sequential_model:
             act.append(z)
         return np.array(z), np.array(pre_act), np.array(act)
 
-    def back_prop(self, pred, Y, pre_act, act):
+    def _back_prop(self, pred, Y, pre_act, act):
         """
         back propagates the error
         and tweaks the weights and 
@@ -97,11 +97,11 @@ class nn_sequential_model:
         ep, err = [], []
         for _ in tqdm(range(0, self.epochs), ncols=100):
             i = np.random.randint(0, len(X_train))
-            pred, pre_act, act = self.feed_forward(X_train[i])
-            error = self.back_prop(pred=pred,
-                                   Y=Y_train[i],
-                                   pre_act=pre_act,
-                                   act=act)
+            pred, pre_act, act = self._feed_forward(X_train[i])
+            error = self._back_prop(pred=pred,
+                                    Y=Y_train[i],
+                                    pre_act=pre_act,
+                                    act=act)
 
             if plot_freq is not None and (_ % plot_freq) == 0:
                 error = round(error, 2)
@@ -133,7 +133,7 @@ class nn_sequential_model:
         """
         result = []
         for x in X_test:
-            err, _, _ = self.feed_forward(x)
+            err, _, _ = self._feed_forward(x)
             result.append(err)
         return np.array(result)
 
