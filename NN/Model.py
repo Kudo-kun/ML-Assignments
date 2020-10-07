@@ -65,8 +65,7 @@ class nn_sequential_model:
         delta = (pred - Y)
         for i in range(self.nLayers - 1, -1, -1):
             if i < (self.nLayers - 1):
-                delta = ed * self.layers[i].activation(pre_act[i],
-                                                       derv=True)
+                delta = ed * self.layers[i].activation(pre_act[i], derv=True)
                 grad = np.outer(delta, act[i + 1])
                 grad_w.append(grad)
             if i > 0:
@@ -75,16 +74,14 @@ class nn_sequential_model:
 
         grad_w = np.array(grad_w[::-1])
         grad_b = np.array(grad_b[::-1])
-        dw, db = self.optimizer.update(grad_w, grad_b)
-        self.W -= dw
-        self.B -= db
+        self.W -= self.lr * grad_w
+        self.B -= self.lr * grad_b
         return error
 
-    def compile(self, loss, epochs, optimizer):
+    def compile(self, loss, epochs=100, lr=0.01):
+        self.lr = lr
         self.loss = loss
         self.epochs = epochs + 1
-        self.optimizer = optimizer
-        self.optimizer.set_init(self.W, self.B)
 
     def fit(self, X_train, Y_train, plot_freq=None):
         """

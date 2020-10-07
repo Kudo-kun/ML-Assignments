@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 from Layers import dense_layer
 from Model import nn_sequential_model
-from Optimizers import SGD, RMSprop, Adam
 import DataPreprocessor as dp
 
 
@@ -18,14 +17,7 @@ ann.add_layer(dense_layer(10, activation="relu"))
 ann.add_layer(dense_layer(7, activation="leaky_relu"))
 ann.add_layer(dense_layer(7, activation="leaky_relu"))
 ann.add_layer(dense_layer(1, activation="sigmoid"))
-
-optim = SGD(lr=1e-3)
-optim = RMSprop(lr=1e-3)
-optim = Adam(lr=1e-3)
-ann.compile(optimizer=optim,
-            epochs=20000,
-            loss="binary_crossentropy")
-
+ann.compile(epochs=20000, loss="binary_crossentropy")
 ann.fit(X_train, Y_train, plot_freq=None)
 
 print("\ntraining metrics:")
