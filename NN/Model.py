@@ -14,13 +14,13 @@ class nn_sequential_model:
         self.layers = []
         self.nLayers = 0
 
-    def add_layer(self, layer, initialization="uniform", seed=5):
+    def add_layer(self, layer, initialization="uniform", seed=42):
         """
         add a new layer to the model
         i.e. append a new set of weights
         and biases
         """
-        np.random.seed(seed)
+        # np.random.seed(seed)
         self.nLayers += 1
         self.layers.append(layer)
         if self.nLayers > 1:
@@ -56,26 +56,20 @@ class nn_sequential_model:
         and tweaks the weights and 
         biases in the network
         """
-        deltas, grad_w, grad_b = [], [], []
         if self.loss == "mse":
             error = Losses.mean_squared_error(Y, pred)
         elif self.loss == "binary_crossentropy":
             error = Losses.binary_crossentropy(Y, pred)
 
-        delta = (pred - Y)
+        db = (pred - Y)
         for i in range(self.nLayers - 1, -1, -1):
-            if i < (self.nLayers - 1):
-                delta = ed * self.layers[i].activation(pre_act[i], derv=True)
-                grad = np.outer(delta, act[i + 1])
-                grad_w.append(grad)
+            if i < self.nLayers - 1:
+                db = dz * self.layers[i].activation(pre_act[i], derv=True)
+                dw = np.outer(db, act[i + 1])
+                self.W[i] -= self.lr * dw
             if i > 0:
-                grad_b.append(delta)
-                ed = np.dot(self.W[i - 1], delta)
-
-        grad_w = np.array(grad_w[::-1])
-        grad_b = np.array(grad_b[::-1])
-        self.W -= self.lr * grad_w
-        self.B -= self.lr * grad_b
+                self.B[i - 1] -= self.lr * db
+                dz = np.dot(self.W[i - 1], db)
         return error
 
     def compile(self, loss, epochs=100, lr=0.01):
@@ -92,7 +86,8 @@ class nn_sequential_model:
         completed.
         """
         ep, err = [], []
-        for _ in tqdm(range(0, self.epochs), ncols=100):
+        # for _ in tqdm(range(0, self.epochs), ncols=100):
+        for _ in range(self.epochs):
             i = np.random.randint(0, len(X_train))
             pred, pre_act, act = self._feed_forward(X_train[i])
             error = self._back_prop(pred=pred,
@@ -100,11 +95,11 @@ class nn_sequential_model:
                                     pre_act=pre_act,
                                     act=act)
 
-            if plot_freq is not None and (_ % plot_freq) == 0:
+            if plot_freq is not None and not (_ % plot_freq):
                 error = round(error, 2)
                 err.append(error)
                 ep.append(_)
-                # print("epoch: {}\tloss: {}".format(_, error))
+                print("epoch: {}\tloss: {}".format(_, error))
 
         if plot_freq != None:
             plt.xlabel("epochs")
@@ -162,5 +157,4 @@ class nn_sequential_model:
                 print("final recall: {}".format(recall))
                 print("final precision: {}".format(precision))
                 print("final fscore: {}".format(fscore))
-
             return accuracy

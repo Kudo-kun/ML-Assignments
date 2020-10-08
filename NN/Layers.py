@@ -3,7 +3,7 @@ import NonLinearizers
 
 class dense_layer:
 
-    def __init__(self, units, activation):
+    def __init__(self, units, activation="linear"):
         """
         arguments:
         units -- number of nodes in that layer
