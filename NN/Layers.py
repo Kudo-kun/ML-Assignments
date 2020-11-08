@@ -22,3 +22,5 @@ class dense_layer:
             self.activation = NonLinearizers.relu
         elif activation == "leaky_relu":
             self.activation = NonLinearizers.leaky_relu
+        elif activation == "softmax":
+            self.activation = NonLinearizers.softmax

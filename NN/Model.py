@@ -1,9 +1,8 @@
-import Losses
 import numpy as np
 from math import sqrt
 import NonLinearizers
 import matplotlib.pyplot as plt
-from tqdm import tqdm
+import Losses
 
 
 class nn_sequential_model:
@@ -14,13 +13,13 @@ class nn_sequential_model:
         self.layers = []
         self.nLayers = 0
 
-    def add_layer(self, layer, initialization="uniform", seed=42):
+    def add_layer(self, layer, initialization="uniform", seed=0):
         """
         add a new layer to the model
         i.e. append a new set of weights
         and biases
         """
-        # np.random.seed(seed)
+        np.random.seed(seed)
         self.nLayers += 1
         self.layers.append(layer)
         if self.nLayers > 1:
@@ -60,6 +59,8 @@ class nn_sequential_model:
             error = Losses.mean_squared_error(Y, pred)
         elif self.loss == "binary_crossentropy":
             error = Losses.binary_crossentropy(Y, pred)
+        elif self.loss == "categorical_crossentropy":
+            error = Losses.categorical_crossentropy(Y, pred)
 
         db = (pred - Y)
         for i in range(self.nLayers - 1, -1, -1):
@@ -86,7 +87,6 @@ class nn_sequential_model:
         completed.
         """
         ep, err = [], []
-        # for _ in tqdm(range(0, self.epochs), ncols=100):
         for _ in range(self.epochs):
             i = np.random.randint(0, len(X_train))
             pred, pre_act, act = self._feed_forward(X_train[i])
@@ -139,22 +139,12 @@ class nn_sequential_model:
             mse = (error / pred.shape[0])
             print("final mse: {}".format(mse))
         elif self.loss == "binary_crossentropy":
-            cm = np.array([[0, 0], [0, 0]])
             pred[pred >= 0.5] = 1
             pred[pred < 0.5] = 0
-            zipped = np.array(list(zip(pred, Y_test)))
-            for (x, y) in zipped:
-                cm[int(x)][int(y)] += 1
+            accuracy = (np.sum(pred == Y_test))/len(Y_test)
+            accuracy = round(accuracy, 2)
+            print(accuracy)
+        elif self.loss == "categorical_crossentropy":
+            pass
 
-            accuracy = ((cm[0][0] + cm[1][1]) / np.sum(cm)) * 100
-            recall = (cm[1][1] / (cm[1][1] + cm[0][1])) * 100
-            precision = (cm[1][1] / np.sum(cm[1])) * 100
-            fscore = 2 * ((precision * recall) / (precision + recall))
-            if verbose:
-                print("tp = {}, tn = {}, fp = {}, fn = {}".format(
-                    cm[1][1], cm[0][0], cm[1][0], cm[0][1]))
-                print("final accuracy: {}".format(accuracy))
-                print("final recall: {}".format(recall))
-                print("final precision: {}".format(precision))
-                print("final fscore: {}".format(fscore))
-            return accuracy
+

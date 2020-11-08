@@ -1,6 +1,14 @@
 import numpy as np
 
 
+def softmax(s, derv=False):
+    if not derv:
+        p = np.exp(s)
+        return (p/np.sum(p))
+    else:
+        pass
+
+
 def sigmoid(s, derv=False):
     x = (1 / (1 + np.exp(-s)))
     if not derv:
