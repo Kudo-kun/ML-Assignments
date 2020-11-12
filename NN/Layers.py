@@ -12,6 +12,8 @@ class dense_layer:
                       with this layer
         """
         self.units = units
+        self.actv = None
+        self.preactv = None 
         if activation == "sigmoid":
             self.activation = NonLinearizers.sigmoid
         elif activation == "tanh":

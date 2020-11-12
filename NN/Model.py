@@ -1,7 +1,9 @@
 import numpy as np
 from math import sqrt
 import NonLinearizers
+from random import randrange
 import matplotlib.pyplot as plt
+plt.style.use("ggplot")
 import Losses
 
 
@@ -37,19 +39,18 @@ class nn_sequential_model:
         perform a forward pass and
         return the final predictions
         """
-        act, pre_act = [], []
-        z = (self.layers[0].activation(X))
-        pre_act.append(X)
-        act.append(z)
+        self.layers[0].preactv = X
+        self.layers[0].actv = self.layers[0].activation(X)
         for i in range(1, self.nLayers):
+            z = self.layers[i - 1].actv
             a = np.dot(self.W[i - 1].T, z)
             a += self.B[i - 1]
             z = self.layers[i].activation(a)
-            pre_act.append(a)
-            act.append(z)
-        return np.array(z), np.array(pre_act), np.array(act)
+            self.layers[i].preactv = a
+            self.layers[i].actv = z
+        return self.layers[-1].actv
 
-    def _back_prop(self, pred, Y, pre_act, act):
+    def _back_prop(self, pred, Y):
         """
         back propagates the error
         and tweaks the weights and 
@@ -65,8 +66,10 @@ class nn_sequential_model:
         db = (pred - Y)
         for i in range(self.nLayers - 1, -1, -1):
             if i < self.nLayers - 1:
-                db = dz * self.layers[i].activation(pre_act[i], derv=True)
-                dw = np.outer(db, act[i + 1])
+                a = self.layers[i].preactv
+                z = self.layers[i + 1].actv
+                db = dz * self.layers[i].activation(a, derv=True)
+                dw = np.outer(db, z)
                 self.W[i] -= self.lr * dw
             if i > 0:
                 self.B[i - 1] -= self.lr * db
@@ -86,27 +89,23 @@ class nn_sequential_model:
         forward pass and a backprop are
         completed.
         """
-        ep, err = [], []
+        it, err = [], []
         for _ in range(self.epochs):
-            i = np.random.randint(0, len(X_train))
-            pred, pre_act, act = self._feed_forward(X_train[i])
-            error = self._back_prop(pred=pred,
-                                    Y=Y_train[i],
-                                    pre_act=pre_act,
-                                    act=act)
-
+            i = randrange(len(X_train) - 1)
+            pred = self._feed_forward(X_train[i])
+            error = self._back_prop(pred=pred, Y=Y_train[i])
             if plot_freq is not None and not (_ % plot_freq):
                 error = round(error, 2)
                 err.append(error)
-                ep.append(_)
-                print("epoch: {}\tloss: {}".format(_, error))
+                it.append(_)
+                # print("epoch: {}\tloss: {}".format(_, error))
 
         if plot_freq != None:
             plt.xlabel("epochs")
             plt.ylabel("cost")
-            plt.plot(ep, err)
+            plt.plot(it, err, color='r')
             plt.show()
-        return
+        return error
 
     def get_params(self):
         """
@@ -125,11 +124,10 @@ class nn_sequential_model:
         """
         result = []
         for x in X_test:
-            err, _, _ = self._feed_forward(x)
-            result.append(err)
+            result.append(self._feed_forward(x))
         return np.array(result)
 
-    def evaluate(self, pred, Y_test, verbose=False):
+    def evaluate(self, pred, Y_test):
         """
         prints the necessary metrics
         for the corresponding prediction
@@ -142,8 +140,7 @@ class nn_sequential_model:
             pred[pred >= 0.5] = 1
             pred[pred < 0.5] = 0
             accuracy = (np.sum(pred == Y_test))/len(Y_test)
-            accuracy = round(accuracy, 2)
-            print(accuracy)
+            print(round(accuracy, 3))
         elif self.loss == "categorical_crossentropy":
             pass
 

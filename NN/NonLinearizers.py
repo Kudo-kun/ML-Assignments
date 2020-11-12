@@ -8,7 +8,6 @@ def softmax(s, derv=False):
     else:
         pass
 
-
 def sigmoid(s, derv=False):
     x = (1 / (1 + np.exp(-s)))
     if not derv:
@@ -37,7 +36,7 @@ def relu(s, derv=False):
         return np.array([f(i) for i in s])
 
 def leaky_relu(s, derv=False):
-    a = 0.01
+    a = 0.3
     if not derv:
         f = lambda x: (x if x >= 0 else a*x)
         return np.array([f(i) for i in s])
