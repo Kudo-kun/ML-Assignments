@@ -19,8 +19,10 @@ def train_test_split(df, split_ratio, normalize=False, standardize=False):
 	xfeatures=len(df.columns) - 1
 	xattr = df.columns[:xfeatures]
 	yattr = df.columns[xfeatures:]
-	X = df[xattr][:sz]
-	Y = df[yattr][:sz]
-	x = df[xattr][sz:]
-	y = df[yattr][sz:]
-	return (np.array(X), np.array(Y), np.array(x), np.array(y))
+	X = np.array(df[xattr][:sz])
+	Y = np.array(df[yattr][:sz])
+	Y.resize(len(Y), 1)
+	x = np.array(df[xattr][sz:])
+	y = np.array(df[yattr][sz:])
+	y.resize(len(y), 1)
+	return (X, Y, x, y)

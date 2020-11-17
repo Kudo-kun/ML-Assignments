@@ -26,20 +26,10 @@ def linear(s, derv=False):
     if not derv:
         return s
     else:
-        return 1
+        return np.ones(s.shape)
 
 def relu(s, derv=False):
     if not derv:
         return np.maximum(0, s)
     else:
-        f = lambda x: (1 if x >= 0 else 0)
-        return np.array([f(i) for i in s])
-
-def leaky_relu(s, derv=False):
-    a = 0.3
-    if not derv:
-        f = lambda x: (x if x >= 0 else a*x)
-        return np.array([f(i) for i in s])
-    else:
-        f = lambda x: (1 if x >= 0 else a)
-        return np.array([f(i) for i in s])
+        return np.vectorize(lambda x: (1 if x >= 0 else 0))(s)
