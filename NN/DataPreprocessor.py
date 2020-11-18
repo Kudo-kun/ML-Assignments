@@ -5,11 +5,11 @@ import numpy as np
 def train_test_split(df, split_ratio, normalize=False, standardize=False):
 	for col in df.columns:
 		if col != "T":
-			if normalize:
+			if standardize:
 				mx = df[col].max()
 				mn = df[col].min()
 				df[col] = (df[col] - mn) / (mx - mn)
-			elif standardize:
+			elif normalize:
 				u = df[col].mean()
 				sig = df[col].std()
 				df[col] = (df[col] - u) / sig

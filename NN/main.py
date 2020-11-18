@@ -9,7 +9,7 @@ columns = ["F0", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "T"]
 raw_df = pd.read_csv("data.txt", names=columns, sep=",").sample(frac=1)
 X_train, Y_train, x_test, y_test = dp.train_test_split(raw_df,
                                                        split_ratio=0.7,
-                                                       standardize=True)
+                                                       normalize=True)
 
 
 ann = nn_sequential_model()
