@@ -8,6 +8,12 @@ def softmax(s, derv=False):
     else:
         pass
 
+def softplus(s, derv=False):
+    if not derv:
+        return np.log(1 + np.exp(s))
+    else:
+        return sigmoid(s)
+
 def sigmoid(s, derv=False):
     x = (1 / (1 + np.exp(-s)))
     if not derv:
