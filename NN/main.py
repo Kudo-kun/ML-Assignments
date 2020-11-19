@@ -14,7 +14,8 @@ X_train, Y_train, x_test, y_test = dp.train_test_split(raw_df,
 
 ann = nn_sequential_model()
 ann.add_layer(dense_layer(10))
-ann.add_layer(dense_layer(7, activation="softplus"))
+ann.add_layer(dense_layer(15, activation="softplus"))
+ann.add_layer(dense_layer(15, activation="softplus"))
 ann.add_layer(dense_layer(1, activation="sigmoid"))
 ann.compile(epochs=50000, loss="binary_crossentropy", lr=1e-3)
 ann.fit(X_train, Y_train, plot_freq=1, batch_size=16)
